@@ -28,6 +28,11 @@
 #define HUD_LUT_DIFF HUD_LUT_GLOBAL
 #endif
 
+#define MARIO_HEALTH 1
+#define SONIC_HEALTH 2
+#define MARIO_HEALTH_SELECTED 0x02
+#define SONIC_HEALTH_SELECTED 0x04
+
 #ifdef VERSION_CN
 #define HUD_LUT_CNDIFF HUD_LUT_CNFIX
 #else
@@ -51,6 +56,7 @@ enum MenuMode {
     MENU_MODE_UNUSED_3
 };
 
+extern s8 gDialogHealthSystem;
 extern s8 gDialogCourseActNum;
 extern s8 gHudFlash;
 

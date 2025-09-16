@@ -17,6 +17,8 @@
 #include "level_table.h"
 #include "rumble_init.h"
 #include "object_helpers.h"
+#include "game/ingame_menu.h"
+#include "level_update.h"
 
 #include "pc/configfile.h"
 
@@ -645,7 +647,7 @@ void update_ledge_climb(struct MarioState *m, s32 animation, u32 endAction) {
     }
 }
 
-s32 act_ledge_grab(struct MarioState *m) {
+s32 act_ledge_grab(struct MarioState* m) {
     f32 heightAboveFloor;
     s16 intendedDYaw = m->intendedYaw - m->faceAngle[1];
     s32 hasSpaceForMario = (m->ceilHeight - m->floorHeight >= 160.0f);
@@ -654,9 +656,7 @@ s32 act_ledge_grab(struct MarioState *m) {
         m->actionTimer++;
     }
 
-    // ex-alo change
-    // added floor null check to avoid crashes
-    if ((m->floor == NULL) || (m->floor->normal.y < 0.9063078f)) {
+    if (m->floor->normal.y < 0.9063078f) {
         return let_go_of_ledge(m);
     }
 
@@ -669,22 +669,52 @@ s32 act_ledge_grab(struct MarioState *m) {
     }
 
     if (m->input & INPUT_STOMPED) {
-        if (m->marioObj->oInteractStatus & INT_STATUS_MARIO_KNOCKBACK_DMG) {
-            m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
+        if (m->marioObj->oInteractStatus & INTERACT_GRABBABLE) {
+            if (!(m->flags & MARIO_IS_SUPER))
+            {
+                if (gDialogHealthSystem != SONIC_HEALTH)
+                {
+                    m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
+                }
+                else
+                {
+                    if (gMarioState->numCoins > 0)
+                    {
+                        if (gMarioState->numCoins >= 50) {
+                            play_sound(SOUND_GENERAL_RINGLOSS, gGlobalSoundSource);
+                           obj_spawn_yellow_coins_sonic(m->marioObj, 50);
+                            gMarioState->numCoins = 0;
+                            gHudDisplay.coins = 0;
+                        }
+                        else {
+                            play_sound(SOUND_GENERAL_RINGLOSS, gGlobalSoundSource);
+                          obj_spawn_yellow_coins_sonic(m->marioObj, gMarioState->numCoins);
+                            gMarioState->numCoins = 0;
+                            gHudDisplay.coins = 0;
+                        }
+                    }
+                    else
+                    {
+                        m->health = 0xFF;
+                    }
+                }
+            }
         }
         return let_go_of_ledge(m);
     }
-    if (m->actionTimer == 10 && (m->input & INPUT_NONZERO_ANALOG)
 #ifdef VERSION_EU
-        // On EU, you can't slow climb up ledges while holding A.
-        && !(m->input & INPUT_A_DOWN)
+    // On PAL, you can't slow climb up ledges while holding A.
+    if (m->actionTimer == 10 && (m->input & INPUT_NONZERO_ANALOG) && !(m->input & INPUT_A_DOWN))
+#else
+    if (m->actionTimer == 10 && (m->input & INPUT_NONZERO_ANALOG))
 #endif
-    ) {
+    {
         if (intendedDYaw >= -0x4000 && intendedDYaw <= 0x4000) {
             if (hasSpaceForMario) {
                 return set_mario_action(m, ACT_LEDGE_CLIMB_SLOW_1, 0);
             }
-        } else {
+        }
+        else {
             return let_go_of_ledge(m);
         }
     }

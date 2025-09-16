@@ -85,6 +85,7 @@ enum RenderLayers {
 #define INPUT_A_DOWN                 0x0080
 #define INPUT_IN_POISON_GAS          0x0100
 #define INPUT_IN_WATER               0x0200
+//unknown_10 in emulator version
 #define INPUT_STOMPED                0x0400
 #define INPUT_INTERACT_OBJ_GRABBABLE 0x0800
 #define INPUT_UNKNOWN_12             0x1000
@@ -135,6 +136,10 @@ enum RenderLayers {
 #define PARTICLE_BREATH               /* 0x00020000 */ (1 << 17)
 #define PARTICLE_TRIANGLE             /* 0x00040000 */ (1 << 18)
 #define PARTICLE_19                   /* 0x00080000 */ (1 << 19)
+#define PARTICLE_SONIC_TRAIL          /* 0x00120000 */ (1 << 20)
+#define PARTICLE_SONIC_TRAIL_ROLLING          /* 0x00160000 */ (1 << 21)
+#define PARTICLE_SUPER_TRAIL          /* 0x00120000 */ (1 << 22)
+#define PARTICLE_SUPER_TRAIL_ROLLING          /* 0x00160000 */ (1 << 23)
 
 #define MODEL_STATE_NOISE_ALPHA 0x180
 #define MODEL_STATE_METAL       0x200
@@ -148,6 +153,8 @@ enum RenderLayers {
 #define MARIO_METAL_SHOCK               0x00000040
 #define MARIO_TELEPORTING               0x00000080
 #define MARIO_UNKNOWN_08                0x00000100
+#define MARIO_IS_SUPER	                0x00000400
+#define MARIO_IS_SHADOW	                0x00000800
 #define MARIO_NO_FALL_DAMAGE            0X00000200
 #define MARIO_UNKNOWN_13                0x00002000
 #define MARIO_ACTION_SOUND_PLAYED       0x00010000
@@ -326,6 +333,8 @@ enum RenderLayers {
 #define ACT_GETTING_BLOWN              0x010208B8 // (0x0B8 | ACT_FLAG_AIR | ACT_FLAG_INVULNERABLE | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
 #define ACT_THROWN_FORWARD             0x010208BD // (0x0BD | ACT_FLAG_AIR | ACT_FLAG_INVULNERABLE | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
 #define ACT_THROWN_BACKWARD            0x010208BE // (0x0BE | ACT_FLAG_AIR | ACT_FLAG_INVULNERABLE | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
+//sonic
+#define ACT_TRANSFORM				   0x010208BF
 
 // group 0x0C0: submerged actions
 #define ACT_WATER_IDLE                 0x380022C0 // (0x0C0 | ACT_FLAG_STATIONARY | ACT_FLAG_SWIMMING | ACT_FLAG_PAUSE_EXIT | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT)
@@ -438,6 +447,8 @@ enum RenderLayers {
 #define ACT_TORNADO_TWIRLING           0x10020372 // (0x172 | ACT_FLAG_STATIONARY | ACT_FLAG_INVULNERABLE | ACT_FLAG_SWIMMING_OR_FLYING)
 
 // group 0x180: object actions
+
+
 #define ACT_PUNCHING                   0x00800380 // (0x180 | ACT_FLAG_STATIONARY | ACT_FLAG_ATTACKING)
 #define ACT_PICKING_UP                 0x00000383 // (0x183 | ACT_FLAG_STATIONARY)
 #define ACT_DIVE_PICKING_UP            0x00000385 // (0x185 | ACT_FLAG_STATIONARY)
@@ -448,6 +459,7 @@ enum RenderLayers {
 #define ACT_PICKING_UP_BOWSER          0x00000390 // (0x190 | ACT_FLAG_STATIONARY)
 #define ACT_HOLDING_BOWSER             0x00000391 // (0x191 | ACT_FLAG_STATIONARY)
 #define ACT_RELEASING_BOWSER           0x00000392 // (0x192 | ACT_FLAG_STATIONARY)
+#define ACT_SPINDASH				   0x00000393
 
 /*
  this input mask is unused by the controller,

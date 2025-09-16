@@ -140,3 +140,14 @@ void bhv_spawn_star_no_level_exit(u32 starIndex) {
     star->oInteractionSubtype = INT_SUBTYPE_NO_EXIT;
     obj_set_angle(star, 0, 0, 0);
 }
+
+//sp1C = star
+
+void bhv_spawn_emerald_no_level_exit(u32 starIndex, u32 col) {
+
+    struct Object* star = spawn_object(o, MODEL_EMERALD, bhvSpawnedStarNoLevelExit);
+    star->oAnimState = col;
+    star->oBhvParams = starIndex << 24;
+    star->oInteractionSubtype = INT_SUBTYPE_NO_EXIT;
+    obj_set_angle(star, 0, 0, 0);
+}

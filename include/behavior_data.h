@@ -349,6 +349,9 @@ extern const BehaviorScript bhvTree[];
 extern const BehaviorScript bhvSparkle[];
 extern const BehaviorScript bhvSparkleSpawn[];
 extern const BehaviorScript bhvSparkleParticleSpawner[];
+//sonic
+extern const BehaviorScript bhvSonicTrailParticleSpawner[];
+extern const BehaviorScript bhvSonicTrailParticleSpawnerRolling[];
 extern const BehaviorScript bhvSomeGfx[];
 extern const BehaviorScript bhvScuttlebug[];
 extern const BehaviorScript bhvScuttlebugSpawn[];
@@ -612,6 +615,10 @@ extern const BehaviorScript bhvEndBirds1[];
 extern const BehaviorScript bhvEndBirds2[];
 extern const BehaviorScript bhvIntroScene[];
 extern const BehaviorScript bhvUnusedFakeStar[];
+
+//sonic
+extern const BehaviorScript bhvReticle[];
+extern const BehaviorScript bhvEmeraldCircle[];
 
 extern const BehaviorScript bhv2DPhysics[];
 extern const BehaviorScript bhvLegacyScrollTexture[];

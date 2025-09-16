@@ -20,6 +20,18 @@
 
 #define MODEL_MARIO                       0x01        // mario_geo
 #define MODEL_LUIGI                       0x02        // unused
+//sonic
+//#define MODEL_WATER_BOMB 0xE2        // water_bomb_geo
+//#define MODEL_WATER_BOMB_SHADOW 0xE3 // water_bomb_shadow_geo
+#define MODEL_SONIC_BALL 0xE4        // sonic_ball_geo
+#define MODEL_SONIC_TRAIL 0xE5       // sonic_trail_geo
+#define MODEL_SUPER_SONIC 0xE6       // sonic_trail_geo
+#define MODEL_SUPER_BALL 0xE7        // sonic_trail_geo
+#define MODEL_SUPER_TRAIL 0xE8       // sonic_trail_geo
+#define MODEL_RETICLE 0xE9       // sonic_trail_geo
+#define MODEL_EMERALD 0xF0       // sonic_trail_geo
+#define MODEL_EMERALD_CIRCLE 0xF1       // sonic_trail_geo
+
 
 /* Various static level geometry, the geo layout differs but terrain object presets treat them the same.*/
 

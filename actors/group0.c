@@ -25,3 +25,15 @@
 #include "white_particle_small/model.inc.c"
 
 #include "sparkle_animation/model.inc.c"
+
+//sonic
+#include "sonic_ball/model.inc.c"
+
+#include "sonic_trail/model.inc.c"
+
+#include "super_sonic/model.inc.c"
+#include "super_ball/model.inc.c"
+
+#include "reticle/model.inc.c"
+#include "emerald/model.inc.c"
+#include "emerald_circle/model.inc.c"

@@ -2034,6 +2034,8 @@ s16 gCutsceneMsgDuration = -1;
 s16 gCutsceneMsgTimer = 0;
 s8 gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
 s8 gDialogCourseActNum = 1;
+//for sonic health
+s8 gDialogHealthSystem = MARIO_HEALTH;
 
 #if defined(VERSION_JP) || defined(VERSION_SH)
     #define DIAG_VAL1 20
@@ -3049,8 +3051,39 @@ u8 should_render_pause_options(struct MarioState *m) {
 }
 #endif
 
+
+
+void change_dialog_mario_health(void) {
+
+    if (gPlayer3Controller->buttonPressed & B_BUTTON)
+    {
+        play_sound(SOUND_MENU_CHANGE_SELECT, gGlobalSoundSource);
+        if (gDialogHealthSystem == SONIC_HEALTH) {
+            gDialogHealthSystem = MARIO_HEALTH;
+        }
+        else
+        {
+            gDialogHealthSystem = SONIC_HEALTH;
+        }
+    }
+}
+
+
 s16 render_pause_screen(void) {
     s16 index;
+
+    u8 textHealthMario[] = { TEXT_HEALTH_MARIO };
+    u8 textHealthSonic[] = { TEXT_HEALTH_SONIC };
+
+
+    change_dialog_mario_health();
+
+
+/*
+    if (gDialogTextAlpha < 250) {
+        gDialogTextAlpha += 25;
+    }
+    */
 
 #ifdef VERSION_EU
     gInGameLanguage = eu_get_language();
@@ -3126,6 +3159,20 @@ s16 render_pause_screen(void) {
     if (gMenuTextAlpha < 250) {
         gMenuTextAlpha += 25;
     }
+
+    if (gDialogHealthSystem == MARIO_HEALTH) {
+        gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
+        print_generic_string(25, 210, textHealthMario);
+        gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
+
+    }
+    if (gDialogHealthSystem == SONIC_HEALTH) {
+        gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
+        print_generic_string(25, 210, textHealthSonic);
+        gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
+
+    }
+
 
     return MENU_OPT_NONE;
 }

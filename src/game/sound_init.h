@@ -33,6 +33,11 @@ void fadeout_level_music(s16 fadeTimer);
 void play_cutscene_music(u16 seqArgs);
 void play_shell_music(void);
 void stop_shell_music(void);
+
+//sonic
+void play_drown_music(void);
+void stop_drown_music(void);
+
 void play_cap_music(u16 seqArgs);
 void fadeout_cap_music(void);
 void stop_cap_music(void);

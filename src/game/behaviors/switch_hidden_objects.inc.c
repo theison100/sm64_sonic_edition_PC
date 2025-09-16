@@ -32,50 +32,52 @@ void breakable_box_init(void) {
     }
 }
 
-void hidden_breakable_box_actions(void) {
-    struct Object *purpleSwitch;
 
+void hidden_breakable_box_actions(void) {
+    struct Object* purpleSwitch;
     obj_set_hitbox(o, &sBreakableBoxHitbox);
     cur_obj_set_model(MODEL_BREAKABLE_BOX_SMALL);
-
-    if (o->oAction == HIDDEN_OBJECT_ACT_INACTIVE) {
+    if (o->oAction == 0) {
         cur_obj_disable_rendering();
         cur_obj_become_intangible();
-        if (o->oTimer == 0) {
+        if (o->oTimer == 0)
             breakable_box_init();
-        }
-        if (o->oHiddenObjectPurpleSwitch == NULL) {
-            o->oHiddenObjectPurpleSwitch =
-                cur_obj_nearest_object_with_behavior(bhvFloorSwitchHiddenObjects);
-        }
-        if ((purpleSwitch = o->oHiddenObjectPurpleSwitch) != NULL) {
-            if (purpleSwitch->oAction == PURPLE_SWITCH_ACT_TICKING) {
+        if (o->oHiddenObjectPurpleSwitch == NULL)
+            o->oHiddenObjectPurpleSwitch = cur_obj_nearest_object_with_behavior(bhvFloorSwitchHiddenObjects);
+        if ((purpleSwitch = o->oHiddenObjectPurpleSwitch) != NULL)
+            if (purpleSwitch->oAction == 2) {
                 o->oAction++;
                 cur_obj_enable_rendering();
                 cur_obj_unhide();
             }
-        }
-    } else if (o->oAction == HIDDEN_OBJECT_ACT_ACTIVE) {
+    }
+    else if (o->oAction == 1) {
         cur_obj_become_tangible();
-        if (cur_obj_wait_then_blink(360, 20)) {
-            o->oAction = HIDDEN_OBJECT_ACT_INACTIVE;
-        }
+        if (cur_obj_wait_then_blink(360, 20))
+            o->oAction = 0;
         if (cur_obj_was_attacked_or_ground_pounded()) {
             spawn_mist_particles();
-            spawn_triangle_break_particles(30, MODEL_DIRT_ANIMATION, 3.0f, 4);
+            spawn_triangle_break_particles(30, 138, 3.0f, 4);
             o->oAction++;
             cur_obj_play_sound_2(SOUND_GENERAL_BREAK_BOX);
         }
-        load_object_collision_model();
-    } else { // HIDDEN_OBJECT_ACT_BROKEN
+        if (gMarioState->action != ACT_SLIDE_KICK_SLIDE)
+        {
+
+            load_object_collision_model();
+        }
+        else if (gMarioState->forwardVel < 20.0f)
+        {
+            load_object_collision_model();
+        }
+    }
+    else {
         cur_obj_become_intangible();
         cur_obj_disable_rendering();
         o->oInteractStatus = 0;
-        if ((purpleSwitch = o->oHiddenObjectPurpleSwitch) != NULL) {
-            if (purpleSwitch->oAction == PURPLE_SWITCH_ACT_IDLE) {
-                o->oAction = HIDDEN_OBJECT_ACT_INACTIVE;
-            }
-        }
+        if ((purpleSwitch = o->oHiddenObjectPurpleSwitch) != NULL)
+            if (purpleSwitch->oAction == 0)
+                o->oAction = 0;
     }
 }
 

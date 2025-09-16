@@ -77,7 +77,7 @@ KING_BOBOMB_DIRS := king_bobomb water_bubble
 BOO_DIRS         := bookend book chair small_key mad_piano boo haunted_cage
 MR_I_DIRS        := mr_i_eyeball mr_i_iris swoop snufit dorrie scuttlebug
 HOOT_DIRS        := yellow_sphere_small hoot yoshi_egg thwomp bullet_bill heave_ho
-COINS_DIRS       := mist explosion butterfly coin warp_pipe door bowser_key flame blue_fish pebble leaves warp_collision mario_cap power_meter mushroom_1up star sand dirt transparent_star white_particle wooden_signpost tree
+COINS_DIRS       := mist explosion butterfly coin warp_pipe door bowser_key flame blue_fish pebble leaves warp_collision mario_cap marios_metal_cap marios_wing_cap marios_winged_metal_cap power_meter mushroom_1up star sand dirt transparent_star white_particle wooden_signpost tree
 BUBBA_DIRS       := bubba wiggler wiggler_body_part lakitu_enemy spiny_egg spiny
 SKEETER_DIRS     := skeeter seaweed water_mine cyan_fish bub water_ring treasure_chest
 KLEPTO_DIRS      := klepto eyerok pokey tornado
@@ -87,7 +87,7 @@ MOLE_DIRS        := monty_mole_hole monty_mole smoke ukiki fwoosh
 LAKITU_DIRS      := lakitu_cameraman toad mips boo_castle
 PEACH_DIRS       := bird peach yoshi
 BOWSER_DIRS      := bowser_flame impact_ring yellow_sphere bowser bomb impact_smoke
-MARIO_DIRS       := mario bubble walk_smoke burn_smoke stomp_smoke water_wave sparkle water_splash white_particle_small sparkle_animation
+MARIO_DIRS       := mario bubble walk_smoke burn_smoke stomp_smoke water_wave sparkle water_splash white_particle_small sparkle_animation super_sonic sonic_trail sonic_ball super_ball super_trail reticle emerald emerald_circle
 
 ifeq ($(PORT_MOP_OBJS),1)
   MOP_DIRS       := Blargg_MOP Checkpoint_Flag_MOP FlipBlock_MOP Flipswap_Platform_MOP Flipswap_Platform_Border_MOP Flipswitch_Panel_MOP Green_Switchboard_MOP Green_Switchboard_Gears_MOP Moving_Rotating_Block_MOP Noteblock_MOP SandBlock_MOP Shrink_Platform_MOP Shrink_Platform_Border_MOP Spring_MOP Switchblock_MOP Switchblock_Switch_MOP 

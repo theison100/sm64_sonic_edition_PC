@@ -2209,7 +2209,7 @@ chan_end
 
 .layer_CEA:
 layer_transpose -2
-layer_note1 38, 0x30, 127
+layer_note1 41, 0x30, 127
 layer_end
 
 .sound_mario_here_we_go:
@@ -2563,14 +2563,8 @@ layer_jump .layer_C4E
   chan_end
 
   .layer_ECF:
-  layer_delay 0x4e
-  .layer_ED1:
-  layer_loop 50
-  layer_call .layer_fn_EE1
-  layer_loopend
   layer_setinstr 21
-  layer_note1 39, 0x44c, 127
-  layer_jump .layer_ED1
+  layer_note1 38, 0x70, 127
   layer_end
 
   .layer_fn_EE1:
@@ -2727,7 +2721,7 @@ sound_ref .sound_general_coin
 sound_ref .sound_general_coin_water
 sound_ref .sound_general_coin_water
 sound_ref .sound_general_coin_water
-sound_ref .sound_general_coin_water
+sound_ref .sound_general_ringloss
 sound_ref .sound_general_short_star
 sound_ref .sound_general_big_clock
 sound_ref .sound_general_loud_pound
@@ -3119,6 +3113,16 @@ layer_end
 .layer_1254:
 layer_transpose 23
 layer_call .layer_fn_11E6
+layer_end
+
+.sound_general_ringloss:
+chan_setbank 8
+chan_setinstr 0
+chan_setlayer 0, .layer_11E7
+chan_end
+
+.layer_11E7:
+layer_note1 39, 0xAF, 120
 layer_end
 
 .sound_general_short_star:

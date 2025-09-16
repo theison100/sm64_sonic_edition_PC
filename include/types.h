@@ -355,6 +355,7 @@ struct MarioState {
     /*0x74*/ s16 floorAngle;
     /*0x76*/ s16 waterLevel;
     /*0x78*/ struct Object *interactObj;
+    /*sonic homing*/  struct Object* homingObj;
     /*0x7C*/ struct Object *heldObj;
     /*0x80*/ struct Object *usedObj;
     /*0x84*/ struct Object *riddenObj;
@@ -370,6 +371,13 @@ struct MarioState {
     /*0xAA*/ s16 numStars;
     /*0xAC*/ s8 numKeys; // Unused key mechanic
     /*0xAD*/ s8 numLives;
+
+    //sonic
+    u8 coinstartotal;
+    s32 drownTimer;
+    s32 gasTimer;
+    s32 coinTimer;
+    u8 hasEmerald;
     /*0xAE*/ s16 health;
     /*0xB0*/ s16 unkB0;
     /*0xB2*/ u8 hurtCounter;

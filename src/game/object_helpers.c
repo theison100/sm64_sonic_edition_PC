@@ -731,19 +731,19 @@ f32 cur_obj_dist_to_nearest_object_with_behavior(const BehaviorScript *behavior)
     return dist;
 }
 
-struct Object *cur_obj_find_nearest_object_with_behavior(const BehaviorScript *behavior, f32 *dist) {
-    uintptr_t *behaviorAddr = segmented_to_virtual(behavior);
-    struct Object *closestObj = NULL;
-    struct Object *obj;
-    struct ObjectNode *listHead;
+struct Object* cur_obj_find_nearest_object_with_behavior(const BehaviorScript* behavior, f32* dist) {
+    uintptr_t* behaviorAddr = segmented_to_virtual(behavior);
+    struct Object* closestObj = NULL;
+    struct Object* obj;
+    struct ObjectNode* listHead;
     f32 minDist = 0x20000;
 
     listHead = &gObjectLists[get_object_list_from_behavior(behaviorAddr)];
-    obj = (struct Object *) listHead->next;
+    obj = (struct Object*)listHead->next;
 
-    while (obj != (struct Object *) listHead) {
+    while (obj != (struct Object*)listHead) {
         if (obj->behavior == behaviorAddr) {
-            if (obj->activeFlags != ACTIVE_FLAG_DEACTIVATED && obj != o) {
+            if (obj->activeFlags != ACTIVE_FLAG_DEACTIVATED && obj != o && obj->oAction != OBJ_ACT_HORIZONTAL_KNOCKBACK && obj->oAction != OBJ_ACT_VERTICAL_KNOCKBACK && obj->oAction != OBJ_ACT_SQUISHED) {
                 f32 objDist = dist_between_objects(o, obj);
                 if (objDist < minDist) {
                     closestObj = obj;
@@ -751,7 +751,7 @@ struct Object *cur_obj_find_nearest_object_with_behavior(const BehaviorScript *b
                 }
             }
         }
-        obj = (struct Object *) obj->header.next;
+        obj = (struct Object*)obj->header.next;
     }
 
     *dist = minDist;

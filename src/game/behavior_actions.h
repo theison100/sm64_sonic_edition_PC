@@ -3,6 +3,9 @@
 
 void spawn_mist_particles_variable(s32 count, s32 offsetY, f32 size);
 void bhv_spawn_star_no_level_exit(u32);
+//sonic emerald
+void bhv_spawn_emerald_no_level_exit(u32 starIndex, u32 col);
+
 void bhv_door_rendering_loop(void);
 void spawn_triangle_break_particles(s16 numTris, s16 triModel, f32 triSize, s16 triAnimState);
 
@@ -552,6 +555,12 @@ void bhv_intro_scene_loop(void);
 void bhv_dust_smoke_loop(void);
 void bhv_yoshi_loop(void);
 void bhv_volcano_trap_loop(void);
+//sonic
+void bhv_reticle_init(void);
+void bhv_reticle_update(void);
+void bhv_emerald_circle_init(void);
+void bhv_emerald_circle_loop(void);
+
 
 void bhv_2d_physics_loop(void);
 void uv_update_scroll(void);

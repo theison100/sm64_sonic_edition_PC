@@ -763,7 +763,7 @@ ifeq ($(TARGET_SWITCH),1)
   LIBNX ?= $(DEVKITPRO)/libnx
   CROSS ?= aarch64-none-elf-
   SDLCROSS := $(NXPATH)/
-  CC := $(CROSS)gcc
+  CC := $(CROSS)gcc -fdiagnostics-color -w
   CXX := $(CROSS)g++
   STRIP := $(CROSS)strip
   NXARCH := -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
@@ -827,7 +827,7 @@ endif
 
 # change the compiler to gcc, to use the default, install the gcc-mips-linux-gnu package
 ifeq ($(COMPILER_TYPE),gcc)
-  CC      := $(CROSS)gcc
+  CC      := $(CROSS)gcc -fdiagnostics-color -w
   CPP     := cpp
 else ifeq ($(COMPILER_TYPE),clang)
   CC      := clang
@@ -903,7 +903,7 @@ ifeq ($(OSX_BUILD),1) # As in, not using macOS
 endif
 
 ifneq ($(TARGET_WEB),1) # As in, not-web PC port
-  CC ?= $(CROSS)gcc
+  CC ?= $(CROSS)gcc -fdiagnostics-color -w
   CXX ?= $(CROSS)g++
 else
   CC := emcc
@@ -950,7 +950,7 @@ else # Linux & other builds
   OBJDUMP := $(CROSS)objdump
 endif
 
-SDLCONFIG := $(SDLCROSS)sdl2-config
+SDLCONFIG := $(SDLCROSS)sdl2-config --prefix=/mingw64
 
 WINDRES := $(CROSS)windres
 
@@ -1013,7 +1013,7 @@ endif
 # SDL can be used by different systems, so we consolidate all of that shit into this
 
 ifeq ($(SDL2_USED),1)
-  SDLCONFIG := $(SDLCROSS)sdl2-config
+  SDLCONFIG := $(SDLCROSS)sdl2-config --prefix=/mingw64
   BACKEND_CFLAGS += -DHAVE_SDL2=1
 else ifeq ($(SDL1_USED),1)
   SDLCONFIG := $(SDLCROSS)sdl-config
@@ -1387,7 +1387,7 @@ endif
 
 # Make sure build directory exists before compiling anything
 DUMMY != mkdir -p $(ALL_DIRS)
-
+$(BUILD_DIR)/include/text_options_strings.h: $(BUILD_DIR)/include/text_options_strings.h
 $(BUILD_DIR)/include/text_strings.h: $(BUILD_DIR)/include/text_menu_strings.h
 
 ifeq ($(EXT_OPTIONS_MENU),1)

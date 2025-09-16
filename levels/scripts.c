@@ -75,6 +75,17 @@ const LevelScript level_main_scripts_entry[] = {
     LOAD_RAW (/*seg*/ 0x16, _common1_geoSegmentRomStart, _common1_geoSegmentRomEnd),
     LOAD_RAW (/*seg*/ 0x13, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
     ALLOC_LEVEL_POOL(),
+
+    LOAD_MODEL_FROM_GEO(MODEL_SONIC_BALL, sonic_ball_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_SUPER_BALL, super_ball_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_SUPER_SONIC, super_sonic_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_SONIC_TRAIL, sonic_trail_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_SUPER_TRAIL, super_trail_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_EMERALD, emerald_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_EMERALD_CIRCLE, emerald_circle_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_RETICLE,                   reticle_geo),
+
+
     LOAD_MODEL_FROM_GEO(MODEL_MARIO,                   mario_geo),
     LOAD_MODEL_FROM_GEO(MODEL_SMOKE,                   smoke_geo),
     LOAD_MODEL_FROM_GEO(MODEL_SPARKLES,                sparkles_geo),

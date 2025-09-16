@@ -682,18 +682,18 @@ UNUSED static void obj_unused_die(void) {
 
 static void obj_set_knockback_action(s32 attackType) {
     switch (attackType) {
-        case ATTACK_KICK_OR_TRIP:
-        case ATTACK_FAST_ATTACK:
-            o->oAction = OBJ_ACT_VERTICAL_KNOCKBACK;
-            o->oForwardVel = 20.0f;
-            o->oVelY = 50.0f;
-            break;
+    case ATTACK_KICK_OR_TRIP:
+    case ATTACK_FAST_ATTACK:
+        o->oAction = OBJ_ACT_VERTICAL_KNOCKBACK;
+        o->oForwardVel = 20.0f;
+        o->oVelY = 50.0f;
+        break;
 
-        default:
-            o->oAction = OBJ_ACT_HORIZONTAL_KNOCKBACK;
-            o->oForwardVel = 50.0f;
-            o->oVelY = 30.0f;
-            break;
+    default:
+        o->oAction = OBJ_ACT_HORIZONTAL_KNOCKBACK;
+        o->oForwardVel = 50.0f;
+        o->oVelY = 30.0f;
+        break;
     }
 
     o->oFlags &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
@@ -726,8 +726,8 @@ static s32 obj_die_if_above_lava_and_health_non_positive(void) {
     return TRUE;
 }
 
-static s32 obj_handle_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioAction,
-                              u8 *attackHandlers) {
+static s32 obj_handle_attacks(struct ObjectHitbox* hitbox, s32 attackedMarioAction,
+    u8* attackHandlers) {
     s32 attackType;
 
     obj_set_hitbox(o, hitbox);
@@ -735,51 +735,53 @@ static s32 obj_handle_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioActi
     //! Die immediately if above lava
     if (obj_die_if_above_lava_and_health_non_positive()) {
         return 1;
-    } else if (o->oInteractStatus & INT_STATUS_INTERACTED) {
+    }
+    else if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         if (o->oInteractStatus & INT_STATUS_ATTACKED_MARIO) {
             if (o->oAction != attackedMarioAction) {
                 o->oAction = attackedMarioAction;
                 o->oTimer = 0;
             }
-        } else {
+        }
+        else {
             attackType = o->oInteractStatus & INT_STATUS_ATTACK_MASK;
 
             switch (attackHandlers[attackType - 1]) {
-                case ATTACK_HANDLER_NOP:
-                    break;
+            case ATTACK_HANDLER_NOP:
+                break;
 
-                case ATTACK_HANDLER_DIE_IF_HEALTH_NON_POSITIVE:
-                    obj_die_if_health_non_positive();
-                    break;
+            case ATTACK_HANDLER_DIE_IF_HEALTH_NON_POSITIVE:
+                obj_die_if_health_non_positive();
+                break;
 
-                case ATTACK_HANDLER_KNOCKBACK:
-                    obj_set_knockback_action(attackType);
-                    break;
+            case ATTACK_HANDLER_KNOCKBACK:
+                obj_set_knockback_action(attackType);
+                break;
 
-                case ATTACK_HANDLER_SQUISHED:
-                    obj_set_squished_action();
-                    break;
+            case ATTACK_HANDLER_SQUISHED:
+                obj_set_squished_action();
+                break;
 
-                case ATTACK_HANDLER_SPECIAL_KOOPA_LOSE_SHELL:
-                    shelled_koopa_attack_handler(attackType);
-                    break;
+            case ATTACK_HANDLER_SPECIAL_KOOPA_LOSE_SHELL:
+                shelled_koopa_attack_handler(attackType);
+                break;
 
-                case ATTACK_HANDLER_SET_SPEED_TO_ZERO:
-                    obj_set_speed_to_zero();
-                    break;
+            case ATTACK_HANDLER_SET_SPEED_TO_ZERO:
+                obj_set_speed_to_zero();
+                break;
 
-                case ATTACK_HANDLER_SPECIAL_WIGGLER_JUMPED_ON:
-                    wiggler_jumped_on_attack_handler();
-                    break;
+            case ATTACK_HANDLER_SPECIAL_WIGGLER_JUMPED_ON:
+                wiggler_jumped_on_attack_handler();
+                break;
 
-                case ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED:
-                    huge_goomba_weakly_attacked();
-                    break;
+            case ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED:
+                huge_goomba_weakly_attacked();
+                break;
 
-                case ATTACK_HANDLER_SQUISHED_WITH_BLUE_COIN:
-                    o->oNumLootCoins = -1;
-                    obj_set_squished_action();
-                    break;
+            case ATTACK_HANDLER_SQUISHED_WITH_BLUE_COIN:
+                o->oNumLootCoins = -1;
+                obj_set_squished_action();
+                break;
             }
 
             o->oInteractStatus = 0;

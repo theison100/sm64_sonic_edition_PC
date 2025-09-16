@@ -286,32 +286,24 @@ s32 stationary_ground_step(struct MarioState *m) {
 
 extern s32 analog_stick_held_back(struct MarioState *m);
 
-static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
-#if BETTER_RESOLVE_WALL_COLLISION
-    struct WallCollisionData upperWall, lowerWall;
-#else
-    UNUSED struct Surface *lowerWall;
-    struct Surface *upperWall;
-#endif
-    struct Surface *ceil;
-    struct Surface *floor;
+static s32 perform_ground_quarter_step(struct MarioState* m, Vec3f nextPos) {
+    UNUSED struct Surface* lowerWall;
+    struct Surface* upperWall;
+    struct Surface* ceil;
+    struct Surface* floor;
+    f32 ceilHeight;
+    f32 floorHeight;
+    f32 waterLevel;
 
-#if BETTER_RESOLVE_WALL_COLLISION
-    resolve_and_return_wall_collisions_data(nextPos, 30.0f, 24.0f, &lowerWall);
-    resolve_and_return_wall_collisions_data(nextPos, 60.0f, 50.0f, &upperWall);
-#else
     lowerWall = resolve_and_return_wall_collisions(nextPos, 30.0f, 24.0f);
     upperWall = resolve_and_return_wall_collisions(nextPos, 60.0f, 50.0f);
-#endif
 
-    f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
-    f32 ceilHeight = vec3f_find_ceil(nextPos, floorHeight, &ceil);
+    floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
+    ceilHeight = vec3f_find_ceil(nextPos, floorHeight, &ceil);
 
-    f32 waterLevel = find_water_level(nextPos[0], nextPos[2]);
+    waterLevel = find_water_level(nextPos[0], nextPos[2]);
 
-#if !BETTER_RESOLVE_WALL_COLLISION
     m->wall = upperWall;
-#endif
 
     if (floor == NULL) {
         return GROUND_STEP_HIT_WALL_STOP_QSTEPS;
@@ -320,22 +312,22 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     if ((m->action & ACT_FLAG_RIDING_SHELL) && floorHeight < waterLevel) {
         floorHeight = waterLevel;
         floor = &gWaterSurfacePseudoFloor;
-        // ex-alo change
-        // make floorHeight originOffset negative
-        floor->originOffset = -floorHeight;
+        floor->originOffset = floorHeight; //! Wrong origin offset (no effect)
+    }
+
+    if ((m->action == ACT_WALKING) && floorHeight < waterLevel && m->forwardVel > 45.0f) {
+        floorHeight = waterLevel;
+        floor = &gWaterSurfacePseudoFloor;
+        floor->originOffset = floorHeight; //! Wrong origin offset (no effect)
+    }
+
+    if ((m->action == ACT_WALKING) && floorHeight < waterLevel && m->forwardVel > 45.0f) {
+        floorHeight = waterLevel;
+        floor = &gWaterSurfacePseudoFloor;
+        floor->originOffset = floorHeight; //! Wrong origin offset (no effect)
     }
 
     if (nextPos[1] > floorHeight + 100.0f) {
-#if LEDGE_CLIMB_PROTECTION
-        // Prevent some cases of slipping off ledges
-        if ((m->input & INPUT_NONZERO_ANALOG)
-         && (m->forwardVel < 32.0f)
-         && !(m->action & ACT_FLAG_SHORT_HITBOX)
-         && !(m->action & ACT_FLAG_BUTT_OR_STOMACH_SLIDE)
-         && (m->pos[1] <= m->floorHeight)
-         && (mario_get_floor_class(m) != SURFACE_CLASS_VERY_SLIPPERY)
-         && analog_stick_held_back(m)) return GROUND_STEP_NONE;
-#endif
         if (nextPos[1] + 160.0f >= ceilHeight) {
             return GROUND_STEP_HIT_WALL_STOP_QSTEPS;
         }
@@ -346,77 +338,26 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
         return GROUND_STEP_LEFT_GROUND;
     }
 
-#if BETTER_CEILING_HANDLING
-    // Handle getting stuck between a sloped floor/ceiling
-    f32 hitboxHeight = m->marioObj->hitboxHeight;
-    f32 ceilToFloorDist = (ceilHeight - nextPos[1]);
-    //if (ceil && ((nextPos[1] + hitboxHeight) > ceilHeight) && (floorHeight < ceilHeight)) 
-    if (ceil && (ceilToFloorDist < hitboxHeight)) 
-    {
-        if (nextPos[1] > floorHeight) {
-            nextPos[1] = (ceilHeight - hitboxHeight);
-            // Set Mario's position and floor
-            vec3f_copy(m->pos, nextPos);
-            m->ceil = ceil;
-            m->ceilHeight = ceilHeight;
-            m->floor = floor;
-            m->floorHeight = floorHeight;
-            return GROUND_STEP_LEFT_GROUND;
-        } else {
-            f32 push = ((hitboxHeight - ceilToFloorDist) / hitboxHeight);
-            m->vel[0]  = (ceil->normal.x * push);
-            m->vel[2]  = (ceil->normal.z * push);
-            m->pos[0] += m->vel[0];
-            m->pos[2] += m->vel[2];
-            if ((m->pos[1] > m->floorHeight) && (m->pos[1] < (m->floorHeight + hitboxHeight))) m->pos[1] = m->floorHeight;
-            return GROUND_STEP_HIT_WALL_STOP_QSTEPS;
-        }
-    }
-#else
-    // ex-alo change
-    // Changed 160.0f to Mario's hitboxHeight value
-    if (floorHeight + m->marioObj->hitboxHeight >= ceilHeight) {
+    if (floorHeight + 160.0f >= ceilHeight) {
         return GROUND_STEP_HIT_WALL_STOP_QSTEPS;
     }
-#endif
 
     vec3f_set(m->pos, nextPos[0], floorHeight, nextPos[2]);
     m->floor = floor;
     m->floorHeight = floorHeight;
 
-#if BETTER_RESOLVE_WALL_COLLISION
-    // Ensure there's referenced walls so it doesn't read invalid normal values
-    if (upperWall.numWalls > 0) {
-        s16 i;
-        s32 oldWallDYaw = ((m->wall != NULL) ? abs_angle_diff(atan2s(m->wall->normal.z, m->wall->normal.x), m->faceAngle[1]) : 0);
-
-        for (i = 0; i < upperWall.numWalls; i++) {
-            s16 wallDYaw = abs_angle_diff(atan2s(upperWall.walls[i]->normal.z, upperWall.walls[i]->normal.x), m->faceAngle[1]);
-            if (wallDYaw > oldWallDYaw) {
-                oldWallDYaw = wallDYaw;
-                m->wall     = upperWall.walls[i];
-            }
-
-            if (wallDYaw >= 0x2AAA && wallDYaw <= 0x5555) {
-                continue;
-            }
-
-            return GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS;
-        }
-    }
-#else
     if (upperWall != NULL) {
-        // ex-alo change
-        // Simplify angle changes using abs_angle_diff
-        s16 wallDYaw = abs_angle_diff(atan2s(upperWall->normal.z, upperWall->normal.x), m->faceAngle[1]);
+        s16 wallDYaw = atan2s(upperWall->normal.z, upperWall->normal.x) - m->faceAngle[1];
 
         if (wallDYaw >= 0x2AAA && wallDYaw <= 0x5555) {
+            return GROUND_STEP_NONE;
+        }
+        if (wallDYaw <= -0x2AAA && wallDYaw >= -0x5555) {
             return GROUND_STEP_NONE;
         }
 
         return GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS;
     }
-#endif
 
     return GROUND_STEP_NONE;
 }

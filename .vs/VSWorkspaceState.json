@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\actors",
+    "\\build",
+    "\\data",
+    "\\sound",
+    "\\sound\\sequences",
+    "\\src",
+    "\\src\\audio",
+    "\\src\\game",
+    "\\src\\game\\behaviors"
+  ],
+  "SelectedNode": "\\src\\game\\mario_actions_moving.c",
+  "PreviewInSolutionExplorer": false
+}

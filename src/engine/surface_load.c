@@ -187,12 +187,16 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
         list = &gStaticSurfacePartition[cellZ][cellX][listIndex];
     }
 
-    //! (Surface Cucking) Surfaces are sorted by the height of their first vertex.
-    //  Since vertices aren't ordered by height, this causes many lower triangles
-    //  to be sorted higher. This worsens surface cucking since many functions
-    //  only use the first triangle in surface order that fits, missing higher surfaces.
-    //  upperY would be a better sort method, set with optimizations enabled.
+#if !NO_SURFACE_PRIORITY_REORDER || WATER_SURFACES
+#if WATER_SURFACES
+    if (listIndex == SPATIAL_PARTITION_WATER)
+#endif
     {
+        //! (Surface Cucking) Surfaces are sorted by the height of their first vertex.
+        //  Since vertices aren't ordered by height, this causes many lower triangles
+        //  to be sorted higher. This worsens surface cucking since many functions
+        //  only use the first triangle in surface order that fits, missing higher surfaces.
+        //  upperY would be a better sort method, set with optimizations enabled.
         s32 surfacePriority = SURFACE_SORT(surface) * sortDir;
         s32 priority;
         // Loop until we find the appropriate place for the surface in the list.
@@ -206,7 +210,7 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
             list = list->next;
         }
     }
-
+#endif
     newNode->next = list->next;
     list->next = newNode;
 }
@@ -770,17 +774,19 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData, u32 dynam
 #if AUTO_COLLISION_DISTANCE
 // From Kaze
 static f32 get_optimal_collision_distance(struct Object *obj) {
-    register f32 thisVertDist, maxDist = 0.0f;
-    Vec3f thisVertPos;
+    f32 thisVertDist, maxDist = 0.0f;
+    Vec3f thisVertPos, scale;
     TerrainData *collisionData = obj->collisionData;
     collisionData++;
-    register u32 vertsLeft = *(collisionData)++;
+    u32 vertsLeft = *(collisionData)++;
+
+    vec3_copy(scale, obj->header.gfx.scale);
 
     // Loop through the collision vertices to find the vertex
     // with the furthest distance from the model's origin.
     while (vertsLeft) {
         // Apply scale to the position
-        vec3_prod(thisVertPos, collisionData, obj->header.gfx.scale);
+        vec3_prod(thisVertPos, collisionData, scale);
 
         // Get the distance to the model's origin.
         thisVertDist = vec3_sumsq(thisVertPos);
@@ -808,13 +814,16 @@ static TerrainData sDynamicVertices[600];
  */
 void load_object_collision_model(void) {
     struct Object* obj = gCurrentObject;
+
     TerrainData *collisionData = obj->collisionData;
+
 #if AUTO_COLLISION_DISTANCE
     f32 sqrLateralDist;
     vec3f_get_lateral_dist_squared(&obj->oPosX, &gMarioObject->oPosX, &sqrLateralDist);
-    f32 verticalMarioDiff = (gMarioObject->oPosY - obj->oPosY);
-    f32 colDist;
 
+    f32 verticalMarioDiff = (gMarioObject->oPosY - obj->oPosY);
+
+    f32 colDist;
     if (collisionData == NULL) {
         // No collision data, so no collision distance.
         colDist = 0.0f;
@@ -827,15 +836,9 @@ void load_object_collision_model(void) {
         colDist = obj->oCollisionDistance;
     }
 #else
-    f32 marioDist = obj->oDistanceToMario;
-    // On an object's first frame, the distance is set to F32_MAX.
-    // If the distance hasn't been updated, update it now.
-    if (marioDist == F32_MAX) {
-        marioDist = dist_between_objects(obj, gMarioObject);
-    }
-
     f32 colDist = obj->oCollisionDistance;
 #endif
+
     f32 drawDist = obj->oDrawingDistance;
 
     // ex-alo change
@@ -852,11 +855,16 @@ void load_object_collision_model(void) {
         drawDist = colDist;
     }
 
+    f32 marioDist = obj->oDistanceToMario;
+
+    int isInit = (marioDist == F32_MAX);
+
 #if AUTO_COLLISION_DISTANCE
+    // A value higher than 500.0f causes crashes with surfaces
     s32 inColRadius = (
            (sqrLateralDist < sqr(colDist))
         && (verticalMarioDiff > 0 || verticalMarioDiff > -colDist)
-        && (verticalMarioDiff < 0 || verticalMarioDiff < (colDist + 2000.0f))
+        && (verticalMarioDiff < 0 || verticalMarioDiff < (colDist + 500.0f))
     );
 #else
     s32 inColRadius = (marioDist < colDist);
@@ -874,14 +882,11 @@ void load_object_collision_model(void) {
         }
     }
 
-#if AUTO_COLLISION_DISTANCE
-    f32 marioDist = obj->oDistanceToMario;
     // On an object's first frame, the distance is set to F32_MAX.
     // If the distance hasn't been updated, update it now.
-    if (marioDist == F32_MAX) {
+    if (isInit) {
         marioDist = dist_between_objects(obj, gMarioObject);
     }
-#endif
 
 #ifndef NODRAWINGDISTANCE
     if (marioDist < drawDist) {

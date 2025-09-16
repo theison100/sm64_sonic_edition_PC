@@ -46,6 +46,8 @@
 #endif
 
 // Ingame Menu
+#define TEXT_HEALTH_MARIO _("[B] Health: Mario")
+#define TEXT_HEALTH_SONIC _("[B] Health: Sonic")
 #ifdef VERSION_CN
 #define TEXT_PAUSE 0x86, 0x87, 0x8A, 0x8B, 0x8E, 0x8F, 0xFE, 0x88, 0x89, 0x8C, 0x8D, 0x90, 0x91, 0xFF // 暂停
 #define TEXT_HUD_CONGRATULATIONS 0x3A, 0x3B, 0x3E, 0x3F, 0x42, 0x43, 0xFE, 0x3C, 0x3D, 0x40, 0x41, 0x44, 0x45, 0xFF // 祝贺你
@@ -175,10 +177,14 @@
 #define TEXT_COPY_FILE _("COPY FILE")
 #define TEXT_ERASE_FILE _("ERASE FILE")
 #define TEXT_SOUND_SELECT _("SOUND SELECT")
-#define TEXT_FILE_MARIO_A _("MARIO A")
-#define TEXT_FILE_MARIO_B _("MARIO B")
-#define TEXT_FILE_MARIO_C _("MARIO C")
-#define TEXT_FILE_MARIO_D _("MARIO D")
+#define TEXT_FILE_MARIO_A _("SONIC A")
+#define TEXT_FILE_MARIO_B _("SONIC B")
+#define TEXT_FILE_MARIO_C _("SONIC C")
+#define TEXT_FILE_MARIO_D _("SONIC D")
+
+#define TEXT_MARIO_HEALTH_FILE _("Z HEALTH MARIO")
+#define TEXT_SONIC_HEALTH_FILE _("Z HEALTH SONIC")
+
 
 // Menu Options
 #define TEXT_SCORE _("SCORE")

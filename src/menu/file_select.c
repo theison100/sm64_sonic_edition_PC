@@ -184,6 +184,9 @@ static u8 textMarioB[] = { TEXT_FILE_MARIO_B };
 static u8 textMarioC[] = { TEXT_FILE_MARIO_C };
 static u8 textMarioD[] = { TEXT_FILE_MARIO_D };
 
+static unsigned char textHealthM[] = { TEXT_MARIO_HEALTH_FILE };
+static unsigned char textHealthS[] = { TEXT_SONIC_HEALTH_FILE };
+
 #ifndef VERSION_EU
 static u8 textNew[] = { TEXT_NEW };
 static u8 starIcon[] = { GLYPH_STAR, GLYPH_SPACE };
@@ -1676,6 +1679,19 @@ void bhv_menu_button_manager_loop(void) {
  * If the cursor is clicked, sClickPos uses the same value as sCursorPos.
  */
 void handle_cursor_button_input(void) {
+    if (gPlayer3Controller->buttonPressed & Z_TRIG) {
+        if (gDialogHealthSystem == MARIO_HEALTH) {
+            gDialogHealthSystem = SONIC_HEALTH;
+            play_sound(SOUND_GENERAL_RINGLOSS, gGlobalSoundSource);
+        }
+        else
+        {
+            gDialogHealthSystem = MARIO_HEALTH;
+            play_sound(SOUND_GENERAL_HEART_SPIN, gGlobalSoundSource);
+        }
+    }
+
+
     // If scoring a file, pressing A just changes the coin score mode.
     if (sSelectedButtonID == MENU_BUTTON_SCORE_FILE_A || sSelectedButtonID == MENU_BUTTON_SCORE_FILE_B
         || sSelectedButtonID == MENU_BUTTON_SCORE_FILE_C
@@ -1924,6 +1940,30 @@ void print_main_menu_strings(void) {
     // The current sound mode is automatically centered on US and Shindou.
     static s16 sSoundTextX; // TODO: There should be a way to make this match on both US and Shindou.
 #endif
+
+    if (gDialogHealthSystem == MARIO_HEALTH) {
+        gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
+        gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+
+        print_menu_generic_string(250, 41, textHealthM);
+
+
+        gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
+
+
+    }
+    else
+    {
+        gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
+        gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+
+        print_menu_generic_string(250, 41, textHealthS);
+
+        gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
+
+    }
+
+
     // Print "SELECT FILE" text
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);

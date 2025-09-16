@@ -16,3 +16,11 @@
 #include "water_splash/geo.inc.c"
 #include "sparkle_animation/geo.inc.c"
 #include "mario/geo.inc.c"
+//sonic
+#include "sonic_ball/geo.inc.c"
+#include "super_sonic/geo.inc.c"
+#include "super_ball/geo.inc.c"
+#include "reticle/geo.inc.c"
+#include "emerald/geo.inc.c"
+#include "emerald_circle/geo.inc.c"
+#include "sonic_trail/geo.inc.c"

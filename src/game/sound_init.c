@@ -298,6 +298,25 @@ void stop_shell_music(void) {
     }
 }
 
+//sonic
+
+void play_drown_music(void) {
+    play_music(SEQ_PLAYER_LEVEL, SEQUENCE_ARGS(7, SEQ_DROWN), 0);
+    sCurrentShellMusic = SEQUENCE_ARGS(7, SEQ_DROWN);
+    //sCurrentShellMusic = SEQUENCE_ARGS(4, SEQ_LEVEL_SLIDE);
+    //sCurrentShellMusic = SEQUENCE_ARGS(4, SEQ_LEVEL_SLIDE);
+}
+
+void stop_drown_music(void) {
+    if (sCurrentShellMusic != MUSIC_NONE) {
+        //play_music(0, SEQUENCE_ARGS(4, 0), 0);
+        stop_background_music(sCurrentShellMusic);
+        sCurrentShellMusic = MUSIC_NONE;
+        sCurrentMusic = MUSIC_NONE;
+    }
+}
+
+
 #if PERSISTENT_CAP_MUSIC
 static s8 sDoResetMusic = FALSE;
 extern void stop_cap_music(void);

@@ -163,6 +163,8 @@
 #define /*0x110*/ oMarioLongJumpIsSlow   OBJECT_FIELD_S32(0x22)
 #define /*0x110*/ oMarioSteepJumpYaw     OBJECT_FIELD_S32(0x22)
 #define /*0x110*/ oMarioWalkingPitch     OBJECT_FIELD_S32(0x22)
+//sonic
+#define /*0x110*/ oSuperTimer    OBJECT_FIELD_S32(0x1E)  
 
 /* Hidden 1-Up */
 #define /*0x0F4*/ oHidden1UpNumTouchedTriggers OBJECT_FIELD_S32(0x1B)

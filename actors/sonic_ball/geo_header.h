@@ -1,0 +1,15 @@
+extern const GeoLayout sonic_ball_002_switch_opt0_001_switch_opt1[];
+extern const GeoLayout sonic_ball_002_switch_opt0_001_switch_opt2[];
+extern const GeoLayout sonic_ball_002_switch_opt0_001_switch_opt3[];
+extern const GeoLayout sonic_ball_geo[];
+extern Lights1 sonic_ball_sm64_material_012_lights;
+extern u8 sonic_ball_sonicball_rgba16[];
+extern u8 sonic_ball_metal_rgba16[];
+extern Vtx sonic_ball_000_offset_mesh_layer_1_vtx_0[90];
+extern Gfx sonic_ball_000_offset_mesh_layer_1_tri_0[];
+extern Gfx mat_sonic_ball_sm64_material_012[];
+extern Gfx mat_sonic_ball_metal_v4[];
+extern Gfx mat_revert_sonic_ball_metal_v4[];
+extern Gfx sonic_ball_000_offset_mesh_layer_1[];
+extern Gfx sonic_ball_000_offset_mesh_layer_1_mat_override_metal_v4_0[];
+extern Gfx sonic_ball_material_revert_render_settings[];

@@ -127,6 +127,10 @@
 #define ACTIVE_PARTICLE_BREATH               (1 << 17) // 0x00020000
 #define ACTIVE_PARTICLE_V_STAR               (1 << 18) // 0x00040000
 #define ACTIVE_PARTICLE_TRIANGLE             (1 << 19) // 0x00080000
+#define ACTIVE_PARTICLE_SONIC_TRAIL          (1 << 20) // 0x00120000
+#define ACTIVE_PARTICLE_SONIC_TRAIL_ROLLING          (1 << 21) // 0x00120000
+#define PARTICLE_SUPER_TRAIL          /* 0x00120000 */ (1 << 22)
+#define PARTICLE_SUPER_TRAIL_ROLLING          /* 0x00160000 */ (1 << 23)
 
 /* oAction */
 #define OBJ_ACT_LAVA_DEATH        100

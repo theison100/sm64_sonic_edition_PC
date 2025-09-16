@@ -171,4 +171,8 @@ void bhv_rr_cruiser_wing_init(void);
 void bhv_rr_cruiser_wing_loop(void);
 void spawn_default_star(f32 homeX, f32 homeY, f32 homeZ);
 
+//sonic
+extern const BehaviorScript bhvReticle[];
+extern const BehaviorScript bhvEmeraldCircle[];
+
 #endif // OBJ_BEHAVIORS_H

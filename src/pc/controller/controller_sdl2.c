@@ -127,9 +127,7 @@ static void controller_sdl_init(void) {
     controller_sdl_bind();
 
     init_ok = true;
-#ifdef MOUSE_ACTIONS
     mouse_init_ok = true;
-#endif
 }
 
 static SDL_Haptic *controller_sdl_init_haptics(const int joy) {
@@ -163,7 +161,7 @@ static void mouse_control_handler(OSContPad *pad) {
     if (!configMouse) {
         return;
     }
-
+    
     if (mouse_has_center_control && sCurrPlayMode != 2) {
         controller_mouse_enter_relative();
     } else {
@@ -292,30 +290,13 @@ static void controller_sdl_read(OSContPad *pad) {
 }
 
 static void controller_sdl_rumble_play(f32 strength, f32 length) {
-    if (sdl_haptic) {
+    if (sdl_haptic)
         SDL_HapticRumblePlay(sdl_haptic, strength, (u32)(length * 1000.0f));
-    }
-    else {
-#if SDL_VERSION_ATLEAST(2,0,18)
-        uint16_t scaled_strength = strength * pow(2, 16) - 1;
-        if (SDL_GameControllerHasRumble(sdl_cntrl) == SDL_TRUE) {
-            SDL_GameControllerRumble(sdl_cntrl, scaled_strength, scaled_strength, (u32)(length * 1000.0f));
-        }
-#endif
-    }
 }
 
 static void controller_sdl_rumble_stop(void) {
-    if (sdl_haptic) {
+    if (sdl_haptic)
         SDL_HapticRumbleStop(sdl_haptic);
-    }
-    else {
-#if SDL_VERSION_ATLEAST(2,0,18)
-        if (SDL_GameControllerHasRumble(sdl_cntrl) == SDL_TRUE) {
-            SDL_GameControllerRumble(sdl_cntrl, 0, 0, 0);
-        }
-#endif
-    }
 }
 
 static u32 controller_sdl_rawkey(void) {
@@ -358,9 +339,7 @@ static void controller_sdl_shutdown(void) {
 
     haptics_enabled = false;
     init_ok = false;
-#ifdef MOUSE_ACTIONS
     mouse_init_ok = false;
-#endif
 }
 
 struct ControllerAPI controller_sdl = {

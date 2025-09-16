@@ -1766,7 +1766,8 @@ const BehaviorScript bhvBreakableBox[] = {
     CALL_NATIVE(bhv_init_room),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_breakable_box_loop),
-        CALL_NATIVE(load_object_collision_model),
+        //removed for sonic slide kick
+       // CALL_NATIVE(load_object_collision_model),
     END_LOOP(),
     BREAK(),
 };
@@ -3250,6 +3251,41 @@ const BehaviorScript bhvSparkleParticleSpawner[] = {
     END_REPEAT(),
     DEACTIVATE(),
 };
+
+
+const BehaviorScript bhvSonicTrailParticleSpawner[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    PARENT_BIT_CLEAR(oActiveParticleFlags, ACTIVE_PARTICLE_SONIC_TRAIL),
+    BEGIN(OBJ_LIST_UNIMPORTANT),
+    BILLBOARD(),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    SET_FLOAT(oGraphYOffset, 39),
+    SET_RANDOM_FLOAT(oMarioParticleFlags, /*Minimum*/ -0, /*Range*/ 0),
+    SUM_FLOAT(/*Dest*/ oPosX, /*Value 1*/ oPosX, /*Value 2*/ oMarioParticleFlags),
+    SET_INT(oAnimState, -1),
+    BEGIN_REPEAT(6),
+        ADD_INT(oAnimState, 1),
+    END_REPEAT(),
+    DEACTIVATE(),
+};
+
+
+const BehaviorScript bhvSonicTrailParticleSpawnerRolling[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    PARENT_BIT_CLEAR(oActiveParticleFlags, ACTIVE_PARTICLE_SONIC_TRAIL_ROLLING),
+    BEGIN(OBJ_LIST_UNIMPORTANT),
+    BILLBOARD(),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+     SET_FLOAT(oGraphYOffset, 50),
+    SET_RANDOM_FLOAT(oMarioParticleFlags, /*Minimum*/ -0, /*Range*/ 0),
+    SUM_FLOAT(/*Dest*/ oPosX, /*Value 1*/ oPosX, /*Value 2*/ oMarioParticleFlags),
+    SET_INT(oAnimState, -1),
+    BEGIN_REPEAT(6),
+        ADD_INT(oAnimState, 1),
+    END_REPEAT(),
+    DEACTIVATE(),
+};
+
 
 const BehaviorScript bhvScuttlebug[] = {
     BEGIN(OBJ_LIST_GENACTOR),
@@ -6139,6 +6175,28 @@ const BehaviorScript bhvIntroScene[] = {
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_intro_scene_loop),
+    END_LOOP(),
+};
+
+//sonic reticle
+const BehaviorScript bhvReticle[] = {
+    BEGIN(OBJ_LIST_LEVEL),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    BILLBOARD(),
+     SET_HOME(),
+    CALL_NATIVE(bhv_reticle_init),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_reticle_update),
+    END_LOOP(),
+};
+//sonic emerald when turning super
+const BehaviorScript bhvEmeraldCircle[] = {
+    BEGIN(OBJ_LIST_LEVEL),
+        OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+     SET_HOME(),
+    CALL_NATIVE(bhv_emerald_circle_init),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_emerald_circle_loop),
     END_LOOP(),
 };
 

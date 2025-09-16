@@ -89,3 +89,7 @@ UNUSED static const u64 binid_22 = 22;
 #ifdef PORT_MOP_OBJS
 #include "src/extras/mop/models.inc.c"
 #endif
+
+#include "marios_wing_cap/model.inc.c"
+#include "marios_metal_cap/model.inc.c"
+#include "marios_winged_metal_cap/model.inc.c"

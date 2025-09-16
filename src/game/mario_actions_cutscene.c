@@ -330,10 +330,8 @@ struct Object *spawn_obj_at_mario_rel_yaw(struct MarioState *m, ModelID32 model,
  * Clears "cap on head" flag, sets "cap in hand" flag, plays sound
  * SOUND_ACTION_TAKE_OFF_CAP.
  */
-void cutscene_take_cap_off(struct MarioState *m) {
-    m->flags &= ~MARIO_CAP_ON_HEAD;
-    m->flags |= MARIO_CAP_IN_HAND;
-    play_sound(SOUND_ACTION_TAKE_OFF_CAP, m->marioObj->header.gfx.cameraToObject);
+void cutscene_take_cap_off(struct MarioState* m) {
+
 }
 
 /**
@@ -341,11 +339,13 @@ void cutscene_take_cap_off(struct MarioState *m) {
  * Clears "cap in hand" flag, sets "cap on head" flag, plays sound
  * SOUND_ACTION_PUT_ON_CAP.
  */
-void cutscene_put_cap_on(struct MarioState *m) {
-    m->flags &= ~MARIO_CAP_IN_HAND;
-    m->flags |= MARIO_CAP_ON_HEAD;
-    play_sound(SOUND_ACTION_PUT_ON_CAP, m->marioObj->header.gfx.cameraToObject);
+void cutscene_put_cap_on(struct MarioState* m) {
+    /*  m->flags &= ~MARIO_CAP_IN_HAND;
+      m->flags |= MARIO_CAP_ON_HEAD;
+      play_sound(SOUND_ACTION_UNKNOWN43E, m->marioObj->header.gfx.cameraToObject);
+      */
 }
+
 
 /**
  * mario_ready_to_speak: Determine if Mario is able to speak to a NPC
@@ -666,82 +666,82 @@ s32 act_debug_free_move(struct MarioState *m) {
     return FALSE;
 }
 
-void general_star_dance_handler(struct MarioState *m, s32 isInWater) {
+void general_star_dance_handler(struct MarioState* m, s32 isInWater) {
     s32 dialogID;
-#if OBJ_HOLD_TRANSPARENT_STAR
-    s16 i;
-    struct Object *initObj;
-    s16 modelForDances[] = { MODEL_TRANSPARENT_STAR, MODEL_STAR, MODEL_BOWSER_KEY_CUTSCENE, MODEL_BOWSER_KEY };
-#endif
     if (m->actionState == 0) {
         switch (++m->actionTimer) {
-            case 1:
-                #if OBJ_HOLD_TRANSPARENT_STAR
-                initObj = spawn_object(m->marioObj, MODEL_STAR, bhvCelebrationStar);
-                for (i = 0; i < (s16) ARRAY_COUNT(modelForDances); i++) {
-                    if (gLoadedGraphNodes[modelForDances[i]] == m->interactObj->header.gfx.sharedChild) {
-                        initObj->header.gfx.sharedChild = m->interactObj->header.gfx.sharedChild;
-                    }
+        case 1:
+            spawn_object(m->marioObj, MODEL_STAR, bhvCelebrationStar);
+            disable_background_sound();
+            if (m->actionArg & 1) {
+                play_course_clear();
+            }
+            else {
+                if (gCurrLevelNum == LEVEL_BOWSER_1 || gCurrLevelNum == LEVEL_BOWSER_2) {
+                    play_music(SEQ_PLAYER_ENV, SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_COLLECT_KEY), 0);
                 }
-                #else
-                spawn_object(m->marioObj, MODEL_STAR, bhvCelebrationStar);
-                #endif
-                disable_background_sound();
-                if (m->actionArg & 1) {
-                    play_course_clear();
-                } else {
-                    #if OBJ_HOLD_TRANSPARENT_STAR
-                    if (gMarioState->interactObj->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_BOWSER_KEY])
-                    #else
-                    if (gCurrLevelNum == LEVEL_BOWSER_1 || gCurrLevelNum == LEVEL_BOWSER_2)
-                    #endif
-                    {
-                        play_music(SEQ_PLAYER_ENV, SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_COLLECT_KEY), 0);
-                    } else {
-                        play_music(SEQ_PLAYER_ENV, SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_COLLECT_STAR), 0);
-                    }
+                else {
+                    play_music(SEQ_PLAYER_ENV, SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_COLLECT_STAR), 0);
                 }
-                break;
+            }
+            break;
 
-            case 42:
-                play_sound(SOUND_MARIO_HERE_WE_GO, m->marioObj->header.gfx.cameraToObject);
-                break;
+        case 42:
+            play_sound(SOUND_MARIO_HERE_WE_GO, m->marioObj->header.gfx.cameraToObject);
+            break;
 
-            case 80:
-                if (!(m->actionArg & 1)) {
-                    level_trigger_warp(m, WARP_OP_STAR_EXIT);
-                } else {
-                    enable_time_stop();
+        case 80:
+            if ((m->actionArg & 1) == 0) {
+                level_trigger_warp(m, WARP_OP_STAR_EXIT);
+            }
+            else {
+                enable_time_stop();
+                if (m->coinstartotal != 7)
+                {
                     create_dialog_box_with_response(gLastCompletedStarNum == 7 ? DIALOG_013 : DIALOG_014);
-                    m->actionState = 1;
                 }
-                break;
+                else
+                {
+                    create_dialog_box_with_response(gLastCompletedStarNum == 7 ? DIALOG_099 : DIALOG_014);
+                }
+                m->actionState = 1;
+            }
+            break;
         }
-    } else if (m->actionState == 1 && gDialogResponse != DIALOG_RESPONSE_NONE) {
-        if (gDialogResponse == DIALOG_RESPONSE_YES) {
+    }
+    else if (m->actionState == 1 && gDialogResponse) {
+        if (gDialogResponse == 1) {
             save_file_do_save(gCurrSaveFileNum - 1);
         }
         m->actionState = 2;
-    } else if (m->actionState == 2 && is_anim_at_end(m)) {
+    }
+    else if (m->actionState == 2 && is_anim_at_end(m)) {
         disable_time_stop();
         enable_background_sound();
         dialogID = get_star_collection_dialog(m);
-        if (dialogID) {
+        if (dialogID != 0) {
             // look up for dialog
             set_mario_action(m, ACT_READING_AUTOMATIC_DIALOG, dialogID);
-        } else {
+        }
+        else {
             set_mario_action(m, isInWater ? ACT_WATER_IDLE : ACT_IDLE, 0);
         }
     }
 }
 
-s32 act_star_dance(struct MarioState *m) {
+s32 act_star_dance(struct MarioState* m) {
     m->faceAngle[1] = m->area->camera->yaw;
+
     set_mario_animation(m, m->actionState == 2 ? MARIO_ANIM_RETURN_FROM_STAR_DANCE
-                                               : MARIO_ANIM_STAR_DANCE);
+        : MARIO_ANIM_STAR_DANCE);
     general_star_dance_handler(m, 0);
     if (m->actionState != 2 && m->actionTimer >= 40) {
         m->marioBodyState->handState = MARIO_HAND_PEACE_SIGN;
+        m->flags &= ~MARIO_CAP_ON_HEAD;
+    }
+    else
+    {
+        m->flags |= MARIO_CAP_ON_HEAD;
     }
     stop_and_set_height_to_floor(m);
     return FALSE;
@@ -1232,83 +1232,105 @@ s32 act_falling_exit_airborne(struct MarioState *m) {
 #define BREAK //! fallthrough
 #endif
 
-s32 act_exit_land_save_dialog(struct MarioState *m) {
+s32 act_exit_land_save_dialog(struct MarioState* m) {
     s32 animFrame;
     stationary_ground_step(m);
     play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_LANDING);
     switch (m->actionState) {
         // determine type of exit
-        case 0:
-            set_mario_animation(m, m->actionArg == 0 ? MARIO_ANIM_GENERAL_LAND
-                                                     : MARIO_ANIM_LAND_FROM_SINGLE_JUMP);
-            if (is_anim_past_end(m)) {
-                if (gLastCompletedCourseNum != COURSE_BITDW
-                    && gLastCompletedCourseNum != COURSE_BITFS) {
-                    enable_time_stop();
-                }
-
-                set_menu_mode(MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN);
-                gSaveOptSelectIndex = MENU_OPT_NONE;
-
-                m->actionState = 3; // star exit with cap
-                if (!(m->flags & MARIO_CAP_ON_HEAD)) {
-                    m->actionState = 2; // star exit without cap
-                }
-                if (gLastCompletedCourseNum == COURSE_BITDW
-                    || gLastCompletedCourseNum == COURSE_BITFS) {
-                    m->actionState = 1; // key exit
-                }
+    case 0:
+        set_mario_animation(m, m->actionArg == 0 ? MARIO_ANIM_GENERAL_LAND
+            : MARIO_ANIM_LAND_FROM_SINGLE_JUMP);
+        if (is_anim_past_end(m)) {
+            if (gLastCompletedCourseNum != COURSE_BITDW
+                && gLastCompletedCourseNum != COURSE_BITFS) {
+                enable_time_stop();
             }
-            break;
+
+            set_menu_mode(MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN);
+            gSaveOptSelectIndex = 0;
+
+            m->actionState = 3; // star exit with cap
+            if (!(m->flags & MARIO_CAP_ON_HEAD)) {
+                m->actionState = 2; // star exit without cap
+            }
+            if (gLastCompletedCourseNum == COURSE_BITDW
+                || gLastCompletedCourseNum == COURSE_BITFS) {
+                m->actionState = 1; // key exit
+            }
+        }
+        break;
         // key exit
-        case 1:
-            animFrame = set_mario_animation(m, MARIO_ANIM_THROW_CATCH_KEY);
-            switch (animFrame) {
-                case -1:
-                    spawn_obj_at_mario_rel_yaw(m, MODEL_BOWSER_KEY_CUTSCENE, bhvBowserKeyCourseExit, -32768);
-                    BREAK;
-                case 67:
-                    play_sound(SOUND_ACTION_KEY_SWISH, m->marioObj->header.gfx.cameraToObject);
-                    BREAK;
-                case 83:
-                    play_sound(SOUND_ACTION_PAT_BACK, m->marioObj->header.gfx.cameraToObject);
-                    BREAK;
-                case 111:
-                    play_sound(SOUND_ACTION_KEY_UNKNOWN45C, m->marioObj->header.gfx.cameraToObject);
-                    BREAK;
-            }
-            handle_save_menu(m);
-            break;
-        // exit without cap
-        case 2:
-            animFrame = set_mario_animation(m, MARIO_ANIM_MISSING_CAP);
-            if ((animFrame >= 18 && animFrame < 55) || (animFrame >= 112 && animFrame < 134)) {
-                m->marioBodyState->handState = MARIO_HAND_OPEN;
-            }
-            if (!(animFrame < 109) && animFrame < 154) {
-                m->marioBodyState->eyeState = MARIO_EYES_HALF_CLOSED;
-            }
+    case 1:
+        animFrame = set_mario_animation(m, MARIO_ANIM_THROW_CATCH_KEY);
+        if (animFrame <= 105) {
+            m->flags &= ~MARIO_CAP_ON_HEAD;
+        }
+        else
+        {
+            m->flags |= MARIO_CAP_ON_HEAD;
+        }
+        switch (animFrame) {
+        case -1:
 
-            handle_save_menu(m);
-            break;
+            spawn_obj_at_mario_rel_yaw(m, MODEL_BOWSER_KEY_CUTSCENE, bhvBowserKeyCourseExit, -32768);
+            //! fall through
+        case 67:
+            play_sound(SOUND_ACTION_KEY_SWISH, m->marioObj->header.gfx.cameraToObject);
+            //! fall through
+        case 83:
+            play_sound(SOUND_ACTION_PAT_BACK, m->marioObj->header.gfx.cameraToObject);
+            //! fall through
+        case 111:
+          //  play_sound(SOUND_ACTION_UNKNOWN45C, m->marioObj->header.gfx.cameraToObject);
+            // no break
+
+        }
+        handle_save_menu(m);
+        break;
+        // exit without cap
+    case 2:
+        animFrame = set_mario_animation(m, MARIO_ANIM_MISSING_CAP);
+        if ((animFrame >= 18 && animFrame < 55) || (animFrame >= 112 && animFrame < 134)) {
+            m->marioBodyState->handState = MARIO_HAND_OPEN;
+        }
+        if (!(animFrame < 109) && animFrame < 154) {
+            m->marioBodyState->eyeState = MARIO_EYES_HALF_CLOSED;
+        }
+
+        handle_save_menu(m);
+        break;
         // exit with cap
-        case 3:
-            animFrame = set_mario_animation(m, MARIO_ANIM_TAKE_CAP_OFF_THEN_ON);
-            switch (animFrame) {
-                case 12:
-                    cutscene_take_cap_off(m);
-                    break;
-                case 37:
-                // fallthrough
-                case 53:
-                    play_sound(SOUND_ACTION_BRUSH_HAIR, m->marioObj->header.gfx.cameraToObject);
-                    break;
-                case 82:
-                    cutscene_put_cap_on(m);
-                    break;
-            }
-            handle_save_menu(m);
+    case 3:
+        m->flags &= ~MARIO_CAP_ON_HEAD;
+
+        animFrame = set_mario_animation(m, MARIO_ANIM_TAKE_CAP_OFF_THEN_ON);
+        if (animFrame >= 3 && animFrame < 42) {
+            m->marioBodyState->handState = MARIO_HAND_OPEN;
+        }
+        switch (animFrame) {
+
+
+        case 12:
+            cutscene_take_cap_off(m);
+            play_sound(SOUND_MARIO_SNORING3, m->marioObj->header.gfx.cameraToObject);
             break;
+
+
+        case 20:
+            //stop_sound(SOUND_MARIO_SNORING3, m->marioObj->header.gfx.cameraToObject);
+
+            break;
+
+        case 99:
+
+            //cutscene_put_cap_on(m);
+            m->flags |= MARIO_CAP_ON_HEAD;
+            break;
+        }
+        handle_save_menu(m);
+
+        break;
     }
 
     m->marioObj->header.gfx.angle[1] += 0x8000;
@@ -1641,95 +1663,103 @@ s32 act_shocked(struct MarioState *m) {
     return FALSE;
 }
 
-s32 act_squished(struct MarioState *m) {
-    UNUSED u8 filler[4];
+s32 act_squished(struct MarioState* m) {
+    UNUSED s32 pad;
     f32 squishAmount;
     f32 spaceUnderCeil;
     s16 surfAngle;
     s32 underSteepSurf = FALSE; // seems to be responsible for setting velocity?
-#if SMOOTH_SQUISH
-    Vec3f nextScale;
-#endif
 
     if ((spaceUnderCeil = m->ceilHeight - m->floorHeight) < 0) {
         spaceUnderCeil = 0;
     }
 
     switch (m->actionState) {
-        case 0:
-            if (spaceUnderCeil > 160.0f) {
-                m->squishTimer = 0;
-                return set_mario_action(m, ACT_IDLE, 0);
-            }
+    case 0:
+        if (spaceUnderCeil > 160.0f) {
+            m->squishTimer = 0;
+            return set_mario_action(m, ACT_IDLE, 0);
+        }
 
-            m->squishTimer = 0xFF;
+        m->squishTimer = 0xFF;
 
-            if (spaceUnderCeil >= 10.1f) {
-                // Mario becomes a pancake
-                squishAmount = spaceUnderCeil / 160.0f;
-#if SMOOTH_SQUISH
-                vec3f_set(nextScale, (2.0f - squishAmount), squishAmount, (2.0f - squishAmount));
-                approach_vec3f_asymptotic(m->marioObj->header.gfx.scale, nextScale, 0.5f, 0.5f, 0.5f);
-#else
-                vec3f_set(m->marioObj->header.gfx.scale, 2.0f - squishAmount, squishAmount, 2.0f - squishAmount);
-#endif
-            } else {
-                if (!(m->flags & MARIO_METAL_CAP) && m->invincTimer == 0) {
-                    // cap on: 3 units; cap off: 4.5 units
-                    m->hurtCounter += m->flags & MARIO_CAP_ON_HEAD ? 12 : 18;
+        if (spaceUnderCeil >= 10.1f) {
+            // Mario becomes a pancake
+            squishAmount = spaceUnderCeil / 160.0f;
+            vec3f_set(m->marioObj->header.gfx.scale, 2.0f - squishAmount, squishAmount,
+                2.0f - squishAmount);
+        }
+        else {
+            if (!(m->flags & MARIO_METAL_CAP) && m->invincTimer == 0) {
+                // cap on: 3 units; cap off: 4.5 units
+                if (!(m->flags & MARIO_IS_SUPER))
+                {
+                    if (gDialogHealthSystem != SONIC_HEALTH) {
+                        m->hurtCounter += m->flags & MARIO_CAP_ON_HEAD ? 12 : 18;
+                    }
+                    else {
+                        if (gMarioState->numCoins > 0)
+                        {
+                            if (gMarioState->numCoins >= 50) {
+                                play_sound(SOUND_GENERAL_RINGLOSS, gGlobalSoundSource);
+                                obj_spawn_yellow_coins_sonic(m->marioObj, 50);
+                                gMarioState->numCoins = 0;
+                                gHudDisplay.coins = 0;
+                            }
+                            else {
+                                play_sound(SOUND_GENERAL_RINGLOSS, gGlobalSoundSource);
+                                obj_spawn_yellow_coins_sonic(m->marioObj, gMarioState->numCoins);
+                                gMarioState->numCoins = 0;
+                                gHudDisplay.coins = 0;
+                            }
+
+                        }
+                        else
+                        {
+                            m->health = 0xFF;
+                        }
+                    }
                     play_sound_if_no_flag(m, SOUND_MARIO_ATTACKED, MARIO_MARIO_SOUND_PLAYED);
                 }
+            }
 
-                vec3f_set(m->marioObj->header.gfx.scale, 1.8f, 0.05f, 1.8f);
-#ifdef RUMBLE_FEEDBACK
-                queue_rumble_data(10, 80);
-#endif
-                m->actionState = 1;
+            // Both of the 1.8's are really floats, but one of them has to
+            // be written as a double for this to match on EU.
+            vec3f_set(m->marioObj->header.gfx.scale, 1.8, 0.05f, 1.8f);
+
+            m->actionState = 1;
+        }
+        break;
+    case 1:
+        if (spaceUnderCeil >= 30.0f) {
+            m->actionState = 2;
+        }
+        break;
+    case 2:
+        m->actionTimer++;
+        if (m->actionTimer >= 15) {
+            // 1 unit of health
+            if (m->health < 0x0100) {
+                level_trigger_warp(m, WARP_OP_DEATH);
+                // woosh, he's gone!
+                set_mario_action(m, ACT_DISAPPEARED, 0);
             }
-            break;
-        case 1:
-            if (spaceUnderCeil >= 30.0f) {
-                m->actionState = 2;
+            else if (m->hurtCounter == 0) {
+                // un-squish animation
+                m->squishTimer = 30;
+                set_mario_action(m, ACT_IDLE, 0);
             }
-            break;
-        case 2:
-            m->actionTimer++;
-            if (m->actionTimer >= 15) {
-                // 1 unit of health
-                if (m->health < 0x0100) {
-                    level_trigger_warp(m, WARP_OP_DEATH);
-                    // woosh, he's gone!
-                    set_mario_action(m, ACT_DISAPPEARED, 0);
-                } else if (m->hurtCounter == 0) {
-                    // un-squish animation
-                    m->squishTimer = 30;
-                    set_mario_action(m, ACT_IDLE, 0);
-                }
-            }
-            break;
+        }
+        break;
     }
 
-#if BETTER_CEILING_HANDLING
-    m->actionArg++;
-    if ((m->floor != NULL) && (m->ceil != NULL) && ((m->actionArg > 8) || (m->floor->type == SURFACE_BURNING) || (m->ceil->type == SURFACE_BURNING))) {
-
     // steep floor
-    if (m->floor->normal.y < 0.90630779f)
-#else
-    // steep floor
-    if (m->floor != NULL && m->floor->normal.y < 0.5f) 
-#endif
-    {
+    if (m->floor != NULL && m->floor->normal.y < 0.5f) {
         surfAngle = atan2s(m->floor->normal.z, m->floor->normal.x);
         underSteepSurf = TRUE;
     }
     // steep ceiling
-#if BETTER_CEILING_HANDLING
-    if (-0.90630779f < m->ceil->normal.y)
-#else
-    if (m->ceil != NULL && -0.5f < m->ceil->normal.y)
-#endif
-    {
+    if (m->ceil != NULL && -0.5f < m->ceil->normal.y) {
         surfAngle = atan2s(m->ceil->normal.z, m->ceil->normal.x);
         underSteepSurf = TRUE;
     }
@@ -1747,9 +1777,6 @@ s32 act_squished(struct MarioState *m) {
             return FALSE;
         }
     }
-#if BETTER_CEILING_HANDLING
-    }
-#endif
 
     // squished for more than 10 seconds, so kill Mario
     if (m->actionArg++ > 300) {
@@ -1765,16 +1792,13 @@ s32 act_squished(struct MarioState *m) {
     return FALSE;
 }
 
-s32 act_putting_on_cap(struct MarioState *m) {
+s32 act_putting_on_cap(struct MarioState* m) {
     s32 animFrame = set_mario_animation(m, MARIO_ANIM_PUT_CAP_ON);
 
     if (animFrame == 0) {
         enable_time_stop();
     }
 
-    if (animFrame == 28) {
-        cutscene_put_cap_on(m);
-    }
 
     if (is_anim_at_end(m)) {
         set_mario_action(m, ACT_IDLE, 0);
@@ -2518,7 +2542,7 @@ static u8 sMarioBlinkOverride[20] = {
 
 static void end_peach_cutscene_kiss_from_peach(struct MarioState *m) {
     sEndPeachAnimation = 10;
-
+    m->flags &= ~MARIO_CAP_ON_HEAD;
     if (m->actionTimer >= 90) {
         m->marioBodyState->eyeState =
             m->actionTimer < 110 ? sMarioBlinkOverride[m->actionTimer - 90] : MARIO_EYES_HALF_CLOSED;
@@ -2559,50 +2583,51 @@ static void end_peach_cutscene_kiss_from_peach(struct MarioState *m) {
     }
 }
 
-static void end_peach_cutscene_star_dance(struct MarioState *m) {
+static void end_peach_cutscene_star_dance(struct MarioState* m) {
     s32 animFrame = set_mario_animation(m, MARIO_ANIM_CREDITS_PEACE_SIGN);
-
+    m->flags &= ~MARIO_CAP_ON_HEAD;
     if (animFrame == 77) {
         cutscene_put_cap_on(m);
     }
     if (animFrame == 88) {
         play_sound(SOUND_MARIO_HERE_WE_GO, m->marioObj->header.gfx.cameraToObject);
     }
-    if (animFrame >= 98) {
+
+    if (animFrame >= 77) {
         m->marioBodyState->handState = MARIO_HAND_PEACE_SIGN;
     }
 
-    if (m->actionTimer < 52) {
+    if (m->actionTimer < 44) {
         m->marioBodyState->eyeState = MARIO_EYES_HALF_CLOSED;
     }
 
     switch (m->actionTimer) {
-        case 70:
-            D_8032CBE4 = 1;
-            break;
+    case 70:
+        D_8032CBE4 = 1;
+        break;
 
-        case 86:
-            D_8032CBE4 = 2;
-            break;
+    case 86:
+        D_8032CBE4 = 2;
+        break;
 
-        case 90:
-            D_8032CBE4 = 3;
-            break;
+    case 90:
+        D_8032CBE4 = 3;
+        break;
 
-        case 120:
-            D_8032CBE4 = 0;
-            break;
+    case 120:
+        D_8032CBE4 = 0;
+        break;
 
-        case 140:
+    case 140:
 #ifndef VERSION_JP
-            seq_player_unlower_volume(SEQ_PLAYER_LEVEL, 60);
+        seq_player_unlower_volume(SEQ_PLAYER_LEVEL, 60);
 #endif
-            play_cutscene_music(SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_CREDITS));
-            break;
+        play_cutscene_music(SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_CREDITS));
+        break;
 
-        case 142:
-            advance_cutscene_step(m);
-            break;
+    case 142:
+        advance_cutscene_step(m);
+        break;
     }
 }
 
@@ -2610,35 +2635,35 @@ static void end_peach_cutscene_star_dance(struct MarioState *m) {
 // "Listen everybody"
 // "let's bake a delicious cake..."
 // "...for Mario..."
-static void end_peach_cutscene_dialog_3(struct MarioState *m) {
+static void end_peach_cutscene_dialog_3(struct MarioState* m) {
     set_mario_animation(m, MARIO_ANIM_FIRST_PERSON);
-
+    m->flags &= ~MARIO_CAP_ON_HEAD;
     sEndPeachObj->oPosY = end_obj_set_visual_pos(sEndPeachObj);
     sEndRightToadObj->oPosY = end_obj_set_visual_pos(sEndRightToadObj);
     sEndLeftToadObj->oPosY = end_obj_set_visual_pos(sEndLeftToadObj);
 
     switch (m->actionTimer) {
-        case 1:
-            sEndPeachAnimation = 0;
-            sEndToadAnims[0] = 0;
-            sEndToadAnims[1] = 2;
-            D_8032CBE8 = 1;
-            set_cutscene_message(160, 227, 5, 30);
+    case 1:
+        sEndPeachAnimation = 0;
+        sEndToadAnims[0] = 0;
+        sEndToadAnims[1] = 2;
+        D_8032CBE8 = 1;
+        set_cutscene_message(160, 227, 5, 30);
 #ifndef VERSION_JP
-            play_sound(SOUND_PEACH_BAKE_A_CAKE, sEndPeachObj->header.gfx.cameraToObject);
+        play_sound(SOUND_PEACH_BAKE_A_CAKE, sEndPeachObj->header.gfx.cameraToObject);
 #endif
-            break;
+        break;
 
-        case 55:
-            set_cutscene_message(160, 227, 6, 40);
-            break;
+    case 55:
+        set_cutscene_message(160, 227, 6, 40);
+        break;
 
-        case 130:
-            set_cutscene_message(160, 227, 7, 50);
+    case 130:
+        set_cutscene_message(160, 227, 7, 50);
 #ifndef VERSION_JP
-            play_sound(SOUND_PEACH_FOR_MARIO, sEndPeachObj->header.gfx.cameraToObject);
+        play_sound(SOUND_PEACH_FOR_MARIO, sEndPeachObj->header.gfx.cameraToObject);
 #endif
-            break;
+        break;
     }
 
     if (m->actionTimer == 350) {
@@ -2815,18 +2840,19 @@ static s32 act_credits_cutscene(struct MarioState *m) {
     return FALSE;
 }
 
-static s32 act_end_waving_cutscene(struct MarioState *m) {
+static s32 act_end_waving_cutscene(struct MarioState* m) {
     if (m->actionState == 0) {
+        m->flags &= ~MARIO_CAP_ON_HEAD;
         m->statusForCamera->cameraEvent = CAM_EVENT_START_END_WAVING;
 
         sEndPeachObj = spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_PEACH, bhvEndPeach, 60, 906,
-                                                 -1180, 0, 0, 0);
+            -1180, 0, 0, 0);
 
         sEndRightToadObj = spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_TOAD, bhvEndToad, 180,
-                                                     906, -1170, 0, 0, 0);
+            906, -1170, 0, 0, 0);
 
         sEndLeftToadObj = spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_TOAD, bhvEndToad, -180,
-                                                    906, -1170, 0, 0, 0);
+            906, -1170, 0, 0, 0);
 
         sEndPeachObj->oOpacity = 255;
         sEndRightToadObj->oOpacity = 255;
